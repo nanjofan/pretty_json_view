@@ -1,0 +1,134 @@
+# Pretty JSON View
+
+A beautiful and customizable JSON viewer for Flutter that provides tree view visualization with features like collapsible nodes, search functionality, and selectable text.
+> Note: This package and its documentation were generated with the assistance of AI (Claude).
+
+> ⚠️ Note: This package has only been tested on Windows platform.
+
+## Screenshots
+
+<p float="left">
+  <img src="example/screenshots/project_image.png" width="400" alt="Project Image"/>
+</p>
+
+## Features
+
+- 🌳 Tree view visualization of JSON data
+- 🔍 Search functionality with highlighted results
+- ✨ Customizable styles and themes
+- 📱 Responsive and interactive UI
+- 🎯 Selectable text content
+- 🎨 Dark mode support
+- 🔄 Expandable/collapsible nodes
+- 📏 Customizable indentation and spacing
+
+## Installation
+
+Add this to your package's `pubspec.yaml` file:
+```yaml
+dependencies:
+  pretty_json_view: ^0.0.1
+```
+
+## Usage
+
+```dart
+import 'package:pretty_json_view/pretty_json_view.dart';
+
+// Basic usage
+JsonTreeView(
+  jsonData: yourJsonData,
+)
+
+// Advanced usage with customization
+JsonTreeView(
+  jsonData: yourJsonData,
+  keyStyle: TextStyle(
+    fontWeight: FontWeight.bold,
+    color: Colors.blue[700],
+  ),
+  valueStyle: TextStyle(
+    color: Colors.black87,
+  ),
+  backgroundColor: Colors.white,
+  enableSearch: true,
+  searchHighlightColor: Colors.yellow,
+  searchHintText: 'Search JSON...',
+  showControls: true,
+  initiallyExpanded: false,
+  indentWidth: 22.0,
+  nodeSpacing: 2.0,
+  nodePadding: EdgeInsets.symmetric(vertical: 2.0),
+)
+```
+
+## Customization
+
+### Styling
+
+You can customize various aspects of the JSON viewer:
+
+- Text styles for keys and values
+- Background color
+- Search highlight color
+- Indentation width
+- Node spacing
+- Node padding
+
+### Theme Support
+
+The widget automatically adapts to light and dark themes:
+```Dart
+JsonTreeView(
+jsonData: yourJsonData,
+keyStyle: TextStyle(
+color: isDarkMode ? Colors.blue[300] : Colors.blue[700],
+),
+valueStyle: TextStyle(
+color: isDarkMode ? Colors.grey[300] : Colors.black87,
+),
+backgroundColor: isDarkMode ? Colors.grey[900] : Colors.white,
+searchHighlightColor: isDarkMode ? Colors.amber[700] : Colors.yellow,
+)
+```
+
+## Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `jsonData` | `dynamic` | The JSON data to display (required) |
+| `keyStyle` | `TextStyle?` | Style for JSON keys |
+| `valueStyle` | `TextStyle?` | Style for JSON values |
+| `backgroundColor` | `Color?` | Background color of the viewer |
+| `enableSearch` | `bool` | Enable/disable search functionality |
+| `searchHighlightColor` | `Color` | Color for search result highlights |
+| `searchHintText` | `String` | Placeholder text for search input |
+| `showControls` | `bool` | Show/hide expand/collapse controls |
+| `initiallyExpanded` | `bool` | Whether to expand all nodes initially |
+| `indentWidth` | `double` | Width of each indentation level |
+| `nodeSpacing` | `double` | Vertical space between nodes |
+| `nodePadding` | `EdgeInsets` | Padding within each node |
+
+## License
+
+MIT License
+Copyright (c) 2024 Meteion.fun
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
