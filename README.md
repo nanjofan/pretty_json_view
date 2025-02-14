@@ -7,7 +7,7 @@ A beautiful and customizable JSON viewer for Flutter that provides tree view vis
 
 ## Screenshots
 
-![image](https://github.com/nanjofan/pretty_json_view/blob/main/example/screenshots/project_image.png)
+![image](https://github.com/nanjofan/pretty_json_view/blob/main/example/screenshots/project_image.png?raw=true)
 
 ## Features
 
