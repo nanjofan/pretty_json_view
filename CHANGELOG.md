@@ -13,4 +13,9 @@
 ## 0.0.2
 
 ### Features
-- 🌳 Update README.md Image
+- 🌳 Update README.md Image URL
+
+## 0.0.3
+
+### Features
+- 🌳 FIX README.md Image URL
