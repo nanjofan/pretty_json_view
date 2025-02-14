@@ -1,21 +1,14 @@
-name: Publish Flutter Package
+name: Publish to pub.dev
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+*'
 
 jobs:
   publish:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: subosito/flutter-action@v1
-        with:
-          flutter-version: '3.0.0'
-      - run: flutter pub get
-      - run: flutter pub publish --dry-run
-      - run: flutter pub publish --force
-        env:
-          PUB_HOSTED_URL: https://pub.dev
-          PUB_CACHE: ${{ github.workspace }}/.pub-cache
+    permissions:
+      id-token: write # Required for authentication using OIDC
+    uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
+    # with:
+    #   working-directory: path/to/package/within/repository
