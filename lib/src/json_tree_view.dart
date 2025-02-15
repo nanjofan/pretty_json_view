@@ -39,7 +39,7 @@ class JsonTreeView extends StatefulWidget {
     this.collapseIcon,
     this.keyStyle,
     this.valueStyle,
-    this.initiallyExpanded = false,
+    this.initiallyExpanded = true,
     this.animationDuration = const Duration(milliseconds: 200),
     this.showControls = true,
     this.enableSearch = true,
@@ -72,6 +72,19 @@ class _JsonTreeViewState extends State<JsonTreeView> {
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(JsonTreeView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // 如果 jsonData 发生变化，重新解析
+    if (widget.jsonData != oldWidget.jsonData) {
+      _searchController.clear(); // 清除搜索
+      _searchQuery = '';        // 重置搜索查询
+      _searchMatchedNodes.clear(); // 清除搜索结果
+      _expandedNodes.clear();   // 清除展开状态
+      _parseJson();            // 重新解析数据
+    }
   }
 
   void _parseJson() {
