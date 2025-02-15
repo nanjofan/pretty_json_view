@@ -1,3 +1,8 @@
+## 0.0.5
+
+* Change input json format to support more complex json
+* Change expand and collapse event to be customizable
+
 ## 0.0.4
 
 * Add data update support: JsonTreeView now properly handles jsonData updates

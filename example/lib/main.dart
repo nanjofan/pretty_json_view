@@ -30,28 +30,32 @@ class JsonViewerDemo extends StatefulWidget {
 
 class _JsonViewerDemoState extends State<JsonViewerDemo> {
   bool _isDarkMode = false;
+  bool _isExpanded = true;
+  final _jsonViewKey = GlobalKey<JsonTreeViewState>();  // 使用公开的 State 类型
   
-  // 添加两个不同的JSON数据
-  final _sampleJson1 = {
-    "string": "Hello World",
-    "number": 42,
-    "boolean": true,
-    "null": null,
-    "array": [1, 2, 3, "four", {"five": 5}],
-  };
+  // 添加两个不同的JSON字符串
+  final _sampleJson1 = '''
+{
+  "string": "Hello World",
+  "number": 42,
+  "boolean": true,
+  "null": null,
+  "array": [1, 2, 3, "four", {"five": 5}]
+}''';
 
-  final _sampleJson2 = {
-    "user": {
-      "name": "John Doe",
-      "age": 30,
-      "email": "john@example.com",
-      "isActive": true,
-      "hobbies": ["reading", "gaming", "coding"]
-    }
-  };
+  final _sampleJson2 = '''
+{
+  "user": {
+    "name": "John Doe",
+    "age": 30,
+    "email": "john@example.com",
+    "isActive": true,
+    "hobbies": ["reading", "gaming", "coding"]
+  }
+}''';
 
-  // 当前显示的JSON数据
-  late Map<String, dynamic> _currentJson;
+  // 当前显示的JSON字符串
+  late String _currentJson;
   
   @override
   void initState() {
@@ -65,17 +69,19 @@ class _JsonViewerDemoState extends State<JsonViewerDemo> {
       appBar: AppBar(
         title: const Text('Pretty JSON View Demo'),
         actions: [
-          // 切换JSON数据的按钮
           IconButton(
-            icon: const Icon(Icons.swap_horiz),
+            icon: Icon(_isExpanded ? Icons.unfold_less : Icons.unfold_more),
             onPressed: () {
               setState(() {
-                _currentJson = _currentJson == _sampleJson1 
-                    ? _sampleJson2 
-                    : _sampleJson1;
+                _isExpanded = !_isExpanded;
+                if (_isExpanded) {
+                  _jsonViewKey.expandAll();
+                } else {
+                  _jsonViewKey.collapseAll();
+                }
               });
             },
-            tooltip: '切换JSON数据',
+            tooltip: _isExpanded ? '折叠所有' : '展开所有',
           ),
           IconButton(
             icon: Icon(_isDarkMode ? Icons.light_mode : Icons.dark_mode),
@@ -88,7 +94,8 @@ class _JsonViewerDemoState extends State<JsonViewerDemo> {
         ],
       ),
       body: JsonTreeView(
-        jsonData: _currentJson,  // 使用当前JSON数据
+        key: _jsonViewKey,  // 使用 GlobalKey
+        jsonString: _currentJson,
         keyStyle: TextStyle(
           fontWeight: FontWeight.bold,
           color: _isDarkMode ? Colors.blue[300] : Colors.blue[700],
@@ -100,8 +107,7 @@ class _JsonViewerDemoState extends State<JsonViewerDemo> {
         enableSearch: true,
         searchHighlightColor: _isDarkMode ? Colors.amber[700]! : Colors.yellow,
         searchHintText: '搜索JSON...',
-        showControls: true,
-        initiallyExpanded: true,
+        initiallyExpanded: _isExpanded,
       ),
     );
   }

@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'models/json_node.dart';
 import 'utils/json_parser.dart';
 import 'json_tree_node.dart';
+import 'dart:convert';
 
 class JsonTreeView extends StatefulWidget {
-  /// JSON数据字符串或Map对象
-  final dynamic jsonData;
+  /// JSON字符串
+  final String jsonString;
   
   /// 节点展开/折叠的图标
   final Widget? expandIcon;
@@ -15,6 +16,9 @@ class JsonTreeView extends StatefulWidget {
   final TextStyle? keyStyle;
   final TextStyle? valueStyle;
   final bool initiallyExpanded;
+
+  /// 展开状态变化回调
+  final void Function(bool isExpanded)? onExpandedChanged;
 
   /// 添加新属性
   final Duration animationDuration;
@@ -33,15 +37,16 @@ class JsonTreeView extends StatefulWidget {
   final EdgeInsets nodePadding;  // 节点内边距
 
   const JsonTreeView({
-    super.key,
-    required this.jsonData,
+    Key? key,
+    required this.jsonString,
     this.expandIcon,
     this.collapseIcon,
     this.keyStyle,
     this.valueStyle,
     this.initiallyExpanded = true,
+    this.onExpandedChanged,
     this.animationDuration = const Duration(milliseconds: 200),
-    this.showControls = true,
+    this.showControls = false,  // 默认不显示控制按钮
     this.enableSearch = true,
     this.searchHighlightColor = const Color(0xFFFFEB3B),
     this.searchHintText = '搜索...',
@@ -49,13 +54,13 @@ class JsonTreeView extends StatefulWidget {
     this.indentWidth = 24.0,           // 默认缩进宽度
     this.nodeSpacing = 4.0,            // 默认节点间距
     this.nodePadding = const EdgeInsets.symmetric(vertical: 4.0),  // 默认节点内边距
-  });
+  }) : super(key: key);
 
   @override
-  State<JsonTreeView> createState() => _JsonTreeViewState();
+  JsonTreeViewState createState() => JsonTreeViewState();
 }
 
-class _JsonTreeViewState extends State<JsonTreeView> {
+class JsonTreeViewState extends State<JsonTreeView> {
   late JsonNode _rootNode;
   final Map<String, bool> _expandedNodes = {};
   String _searchQuery = '';
@@ -77,20 +82,34 @@ class _JsonTreeViewState extends State<JsonTreeView> {
   @override
   void didUpdateWidget(JsonTreeView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // 如果 jsonData 发生变化，重新解析
-    if (widget.jsonData != oldWidget.jsonData) {
-      _searchController.clear(); // 清除搜索
-      _searchQuery = '';        // 重置搜索查询
-      _searchMatchedNodes.clear(); // 清除搜索结果
-      _expandedNodes.clear();   // 清除展开状态
-      _parseJson();            // 重新解析数据
+    if (widget.jsonString != oldWidget.jsonString) {
+      _searchController.clear();
+      _searchQuery = '';
+      _searchMatchedNodes.clear();
+      _expandedNodes.clear();
+      _parseJson();
     }
   }
 
   void _parseJson() {
-    _rootNode = JsonParser.parse(widget.jsonData);
-    if (widget.initiallyExpanded) {
-      _expandAll();
+    try {
+      final dynamic jsonData = json.decode(widget.jsonString);
+      _rootNode = JsonParser.parse(jsonData);
+      if (widget.initiallyExpanded) {
+        _expandAllNodesWithoutSetState(_rootNode);
+      }
+    } catch (e) {
+      _rootNode = JsonParser.parse({
+        "error": "Invalid JSON string",
+        "details": e.toString()
+      });
+    }
+  }
+
+  void _expandAllNodesWithoutSetState(JsonNode node) {
+    _expandedNodes[node.key] = true;
+    for (var child in node.children) {
+      _expandAllNodesWithoutSetState(child);
     }
   }
 
@@ -98,12 +117,14 @@ class _JsonTreeViewState extends State<JsonTreeView> {
     setState(() {
       _expandAllNodes(_rootNode);
     });
+    widget.onExpandedChanged?.call(true);
   }
 
-  void _toggleNode(String key) {
+  void _collapseAll() {
     setState(() {
-      _expandedNodes[key] = !(_expandedNodes[key] ?? false);
+      _expandedNodes.clear();
     });
+    widget.onExpandedChanged?.call(false);
   }
 
   void _handleSearch(String query) {
@@ -165,6 +186,13 @@ class _JsonTreeViewState extends State<JsonTreeView> {
     }
   }
 
+  void _expandAllNodes(JsonNode node) {
+    _expandedNodes[node.key] = true;
+    for (var child in node.children) {
+      _expandAllNodes(child);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -172,7 +200,6 @@ class _JsonTreeViewState extends State<JsonTreeView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (widget.showControls) _buildControls(),
           if (widget.enableSearch) _buildSearchBar(),
           Expanded(
             child: SingleChildScrollView(
@@ -185,40 +212,6 @@ class _JsonTreeViewState extends State<JsonTreeView> {
         ],
       ),
     );
-  }
-  
-  Widget _buildControls() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        children: [
-          TextButton.icon(
-            onPressed: _expandAll,
-            icon: const Icon(Icons.unfold_more),
-            label: const Text('展开所有'),
-          ),
-          const SizedBox(width: 8),
-          TextButton.icon(
-            onPressed: _collapseAll,
-            icon: const Icon(Icons.unfold_less),
-            label: const Text('折叠所有'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _collapseAll() {
-    setState(() {
-      _expandedNodes.clear();
-    });
-  }
-
-  void _expandAllNodes(JsonNode node) {
-    _expandedNodes[node.key] = true;
-    for (var child in node.children) {
-      _expandAllNodes(child);
-    }
   }
 
   Widget _buildSearchBar() {
@@ -290,5 +283,21 @@ class _JsonTreeViewState extends State<JsonTreeView> {
         ),
       ],
     );
+  }
+
+  void _toggleNode(String key) {
+    setState(() {
+      _expandedNodes[key] = !(_expandedNodes[key] ?? false);
+    });
+  }
+}
+
+extension JsonTreeViewStateExtension on GlobalKey<JsonTreeViewState> {
+  void expandAll() {
+    currentState?._expandAll();
+  }
+
+  void collapseAll() {
+    currentState?._collapseAll();
   }
 } 
