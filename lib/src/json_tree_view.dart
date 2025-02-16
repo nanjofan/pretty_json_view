@@ -92,6 +92,12 @@ class JsonTreeViewState extends State<JsonTreeView> {
   }
 
   void _parseJson() {
+    if (widget.jsonString.trim().isEmpty) {
+      // 如果字符串为空，创建一个空的根节点
+      _rootNode = JsonParser.parse({});
+      return;
+    }
+
     try {
       final dynamic jsonData = json.decode(widget.jsonString);
       _rootNode = JsonParser.parse(jsonData);
